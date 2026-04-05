@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Tragedy of Great Power Politics</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0c10;--bg2:#12151c;--bg3:#1a1e28;--text:#c8cdd8;--dim:#6b7280;--accent:#3b82f6;--danger:#ef4444;--warn:#f59e0b;--success:#10b981;--purple:#a78bfa;--border:#2a2f3a;--glow:rgba(59,130,246,0.3)}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;height:100vh;width:100vw;user-select:none}
+h1,h2,h3,.cinzel{font-family:Georgia,'Times New Roman',serif}
+.mono{font-family:'Consolas','Courier New',monospace}
+
+/* Screens */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100}
+.screen.active{display:flex}
+
+/* Title */
+#title h1{font-size:2.8rem;font-weight:900;text-align:center;background:linear-gradient(135deg,#c8cdd8,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.5rem;letter-spacing:2px}
+#title .sub{font-size:1rem;color:var(--dim);letter-spacing:4px;text-transform:uppercase;margin-bottom:2.5rem}
+#title .quote{max-width:580px;text-align:center;font-style:italic;color:var(--dim);line-height:1.6;margin-bottom:2.5rem;font-size:.92rem}
+#title .quote b{color:var(--text);font-weight:600;font-style:normal}
+
+/* Buttons */
+.btn{padding:12px 36px;font-family:Georgia,serif;font-size:.95rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer;transition:all .3s;border-radius:2px;margin:4px}
+.btn:hover{border-color:var(--accent);box-shadow:0 0 20px var(--glow);color:#fff}
+.btn.p{border-color:var(--accent);background:rgba(59,130,246,.1)}
+.btn.d{border-color:var(--danger);background:rgba(239,68,68,.08)}
+.btn.d:hover{box-shadow:0 0 20px rgba(239,68,68,.3);border-color:#f87171}
+.btn.w{border-color:var(--warn);background:rgba(245,158,11,.08)}
+.btn.sm{padding:7px 18px;font-size:.78rem}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+
+/* Nation Select */
+.ngrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:680px}
+.ncard{background:var(--bg2);border:1px solid var(--border);padding:20px;cursor:pointer;transition:all .3s;border-radius:4px;min-width:280px}
+.ncard:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.ncard .flag{font-size:2rem;margin-bottom:6px}
+.ncard h3{font-size:1.1rem;margin-bottom:4px}
+.ncard .st{font-size:.78rem;color:var(--dim);line-height:1.6}
+.ncard .st b{color:var(--text)}
+.ncard .fl{font-size:.78rem;font-style:italic;color:var(--dim);margin-top:6px;border-top:1px solid var(--border);padding-top:6px}
+
+/* Difficulty */
+.dgrid{display:flex;gap:14px}
+.dcard{background:var(--bg2);border:1px solid var(--border);padding:18px 28px;cursor:pointer;transition:all .3s;border-radius:4px;text-align:center;width:200px}
+.dcard:hover{border-color:var(--accent);transform:translateY(-2px)}
+.dcard h3{margin-bottom:4px}
+.dcard p{font-size:.8rem;color:var(--dim)}
+
+/* Game Layout */
+#game{display:none;grid-template-columns:260px 1fr 280px;grid-template-rows:48px 1fr 170px;z-index:50;position:absolute;inset:0}
+#game.active{display:grid}
+
+/* Top Bar */
+#top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:.83rem}
+#top .year{font-family:Georgia,serif;font-size:1.1rem;font-weight:700}
+#top .sr{display:flex;gap:16px;align-items:center}
+.pill{display:flex;align-items:center;gap:3px;padding:2px 8px;background:var(--bg3);border-radius:12px;font-size:.78rem}
+.pill .l{color:var(--dim)}
+.pill .v{font-weight:700;font-family:Consolas,monospace}
+
+/* Left Panel */
+#left{background:var(--bg2);border-right:1px solid var(--border);padding:10px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+#left h4{font-family:Georgia,serif;font-size:.8rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin:8px 0 3px}
+.abtn{width:100%;padding:9px 10px;text-align:left;background:var(--bg3);border:1px solid transparent;color:var(--text);font-size:.8rem;cursor:pointer;transition:all .2s;border-radius:3px;display:flex;align-items:center;gap:6px;font-family:inherit}
+.abtn:hover{border-color:var(--accent);background:rgba(59,130,246,.05)}
+.abtn:disabled{opacity:.3;cursor:not-allowed}
+.abtn .c{margin-left:auto;font-family:Consolas,monospace;font-size:.72rem;color:var(--warn)}
+
+/* Map */
+#maparea{position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#141825 0%,#0a0c10 80%)}
+.rnode{cursor:pointer;transition:all .3s}
+.rnode:hover .nbg{filter:brightness(1.3)}
+.nbg{stroke-width:2;transition:all .3s}
+.rlbl{font-family:'Segoe UI',sans-serif;font-size:10px;fill:var(--text);text-anchor:middle;pointer-events:none;font-weight:600}
+.rpow{font-family:Consolas,monospace;font-size:9px;fill:var(--dim);text-anchor:middle;pointer-events:none}
+.cline{stroke:#2a2f3a;stroke-width:1;stroke-dasharray:4,4}
+.cwater{stroke:#1e3a5f;stroke-width:1.5;stroke-dasharray:6,3}
+.sel .nbg{stroke:#fff!important;stroke-width:3!important;filter:drop-shadow(0 0 8px rgba(255,255,255,.3))}
+
+/* Right Panel */
+#right{background:var(--bg2);border-left:1px solid var(--border);padding:10px;overflow-y:auto;font-size:.8rem}
+#right h4{font-family:Georgia,serif;font-size:.8rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin:8px 0 3px}
+.irow{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(42,47,58,.5)}
+.irow .l{color:var(--dim)}.irow .v{font-weight:600;font-family:Consolas,monospace}
+.pbar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.pfill{height:100%;border-radius:3px;transition:width .5s}
+.pblbl{font-size:.72rem;color:var(--dim);margin-bottom:1px;display:flex;justify-content:space-between}
+
+/* Bottom */
+#bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border-top:1px solid var(--border)}
+#elog{padding:8px 14px;overflow-y:auto;border-right:1px solid var(--border);font-size:.78rem}
+#elog h4{font-family:Georgia,serif;font-size:.78rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.lentry{padding:2px 0;border-bottom:1px solid rgba(42,47,58,.3);line-height:1.4}
+.lentry .ly{color:var(--warn);font-family:Consolas,monospace;font-size:.72rem}
+.lentry.crisis{color:var(--danger)}.lentry.gain{color:var(--success)}.lentry.theory{color:var(--purple)}
+#tpanel{padding:8px 14px;overflow-y:auto}
+#tpanel h4{font-family:Georgia,serif;font-size:.78rem;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;cursor:pointer}
+.cgrid{display:flex;flex-wrap:wrap;gap:3px}
+.ctag{padding:2px 7px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;font-size:.68rem;color:var(--dim);cursor:default;transition:all .3s}
+.ctag.u{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.08);cursor:pointer}
+.ctag.u:hover{background:rgba(167,139,250,.15)}
+
+/* Overlays */
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:200;flex-direction:column}
+.overlay.active{display:flex}
+.overlay.dark{background:rgba(0,0,0,.88)}
+#turnov{z-index:200}
+#mgov{z-index:300;background:rgba(0,0,0,.92)}
+#cmodal{z-index:400;background:rgba(0,0,0,.9)}
+#endscr{z-index:500;background:rgba(0,0,0,.95)}
+
+.mgbox{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:28px;max-width:680px;width:90%;max-height:80vh;overflow-y:auto}
+.mgbox h2{margin-bottom:.4rem}.mgbox .msub{color:var(--dim);font-size:.83rem;margin-bottom:1.2rem}
+
+/* Turn events */
+.tevt{padding:8px 14px;border-left:3px solid var(--border);margin-bottom:6px;background:var(--bg2);border-radius:0 4px 4px 0;font-size:.88rem;line-height:1.5;max-width:580px;width:100%}
+.tevt.cr{border-left-color:var(--danger)}.tevt.gn{border-left-color:var(--success)}.tevt.th{border-left-color:var(--purple)}.tevt.wr{border-left-color:#fff;background:rgba(239,68,68,.1)}
+.tevt .tt{font-weight:700;margin-bottom:3px}
+.tevt .td{color:var(--dim);font-size:.82rem}
+
+/* Brinkmanship */
+.brkmeter{width:100%;height:50px;background:var(--bg3);border-radius:4px;position:relative;margin:16px 0;overflow:hidden}
+.brkfl{position:absolute;top:0;bottom:0;transition:width .3s}
+.brkfl.l{left:0;border-radius:4px 0 0 4px}.brkfl.r{right:0;border-radius:0 4px 4px 0}
+.brkcl{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--warn);transform:translateX(-50%);z-index:2}
+.brkdz{position:absolute;top:0;bottom:0;left:35%;right:35%;background:rgba(239,68,68,.08);border-left:1px dashed rgba(239,68,68,.3);border-right:1px dashed rgba(239,68,68,.3)}
+
+/* Fog of War */
+.fgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 0}
+.fcard{aspect-ratio:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;font-size:.78rem;text-align:center;padding:6px;min-height:72px}
+.fcard:hover:not(.rev){border-color:var(--accent)}.fcard.rev{cursor:default}
+
+/* Nuclear */
+.nukescr{background:#1a0505;border:2px solid var(--danger);border-radius:4px;padding:18px;text-align:center;min-height:220px}
+.nuketmr{font-family:Consolas,monospace;font-size:2.8rem;color:var(--danger);margin:8px 0;animation:nukep 1s infinite}
+@keyframes nukep{0%,100%{opacity:1}50%{opacity:.6}}
+.nukedata{margin:10px 0;text-align:left;font-family:Consolas,monospace;font-size:.78rem;max-height:110px;overflow-y:auto}
+.nukedata .rd{padding:2px 0;border-bottom:1px solid rgba(239,68,68,.2)}
+.nukedata .rd.al{color:var(--danger);font-weight:700}.nukedata .rd.cl{color:var(--success)}.nukedata .rd.am{color:var(--warn)}
+
+/* Proxy */
+.pxzone{display:flex;align-items:center;gap:14px;margin:14px 0}
+.pxside{flex:1;text-align:center;padding:10px;background:var(--bg3);border-radius:4px}
+.pxside h4{font-size:.88rem;margin-bottom:4px}
+.pxbar{width:100%;height:24px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0;position:relative}
+.pxbf{position:absolute;top:0;bottom:0;transition:width .3s}
+.pxbf.y{left:0;background:var(--accent)}.pxbf.t{right:0;background:var(--danger)}
+.pxesc{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0}
+.pxescf{height:100%;background:linear-gradient(90deg,var(--warn),var(--danger));transition:width .3s}
+
+/* Concept Modal */
+.cmod{background:var(--bg2);border:1px solid var(--purple);border-radius:6px;padding:28px;max-width:560px;width:90%}
+.cmod h3{color:var(--purple);margin-bottom:.4rem}
+.cmod .ct{line-height:1.7;font-size:.88rem}
+.cmod .cc{margin-top:.8rem;font-size:.78rem;color:var(--dim);font-style:italic}
+
+/* End screen */
+#endscr h1{font-size:2.2rem;margin-bottom:.8rem}
+.erow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);max-width:500px;width:90%}
+
+/* Tooltip */
+#rtt{position:absolute;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:.78rem;pointer-events:none;z-index:60;display:none;max-width:180px}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.fi{animation:fadeIn .4s ease}
+@keyframes warFlash{0%{background:rgba(239,68,68,.3)}100%{background:transparent}}.wflash{animation:warFlash .5s ease 3}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="title">
+  <h1>The Tragedy of<br>Great Power Politics</h1>
+  <div class="sub cinzel">A Strategic Simulation</div>
+  <div class="quote"><b>The sad fact is that international politics has always been a ruthless and dangerous business, and it is likely to remain that way.</b> In this world, it is better to be Godzilla than Bambi.<br>&mdash; John J. Mearsheimer</div>
+  <button class="btn p" onclick="go('nations')">BEGIN</button>
+</div>
+
+<div class="screen" id="nations">
+  <h2 class="cinzel">Choose Your Great Power</h2>
+  <p style="color:var(--dim);margin-bottom:1.5rem;font-size:.9rem">Each operates under the same structural imperatives. None escapes the tragedy.</p>
+  <div class="ngrid" id="ngrid"></div>
+</div>
+
+<div class="screen" id="diff">
+  <h2 class="cinzel">Structural Constraints</h2>
+  <div class="dgrid" style="margin-top:1.5rem">
+    <div class="dcard" onclick="startGame('normal')"><h3 class="cinzel">Realist</h3><p>Standard AI aggression. Buck-passing viable. Alliances hold.</p></div>
+    <div class="dcard" onclick="startGame('hard')"><h3 class="cinzel">Offensive</h3><p>AI maximizes aggressively. Alliances fragile. Security dilemma bites harder.</p></div>
+    <div class="dcard" onclick="startGame('brutal')"><h3 class="cinzel">Hobbesian</h3><p>War of all against all. Every state is a revisionist. Survival is victory.</p></div>
+  </div>
+</div>
+
+<div id="game">
+  <div id="top">
+    <div class="year cinzel" id="yd">2000</div>
+    <div class="sr">
+      <div class="pill"><span class="l">AP:</span><span class="v" id="apd" style="color:var(--warn)">3</span></div>
+      <div class="pill"><span class="l">&#9876;</span><span class="v" id="mild" style="color:var(--danger)">0</span></div>
+      <div class="pill"><span class="l">&#128176;</span><span class="v" id="ecod" style="color:var(--success)">0</span></div>
+      <div class="pill"><span class="l">&#128269;</span><span class="v" id="intd" style="color:var(--accent)">0</span></div>
+      <div class="pill"><span class="l">&#127760;</span><span class="v" id="infd" style="color:var(--purple)">0</span></div>
+    </div>
+    <div>
+      <button class="btn sm" onclick="showTheory()">Theory</button>
+      <button class="btn sm p" id="etb" onclick="endTurn()">End Turn &rarr;</button>
+    </div>
+  </div>
+  <div id="left"></div>
+  <div id="maparea"><svg id="msvg" viewBox="0 0 800 500"></svg><div id="rtt"></div></div>
+  <div id="right"></div>
+  <div id="bottom">
+    <div id="elog"><h4>Intelligence Briefing</h4><div id="logc"></div></div>
+    <div id="tpanel"><h4 onclick="showTheory()">Theory Tracker (click to expand)</h4><div class="cgrid" id="cgrid"></div></div>
+  </div>
+</div>
+
+<div class="overlay dark" id="turnov">
+  <h2 class="cinzel" id="tot"></h2>
+  <div id="tevts" style="max-width:580px;max-height:380px;overflow-y:auto;margin-bottom:1.2rem;width:100%"></div>
+  <button class="btn p" id="tcb">Continue</button>
+</div>
+
+<div class="overlay" id="mgov">
+  <div class="mgbox"><h2 class="cinzel" id="mgt"></h2><div class="msub" id="mgs"></div><div id="mgc"></div></div>
+</div>
+
+<div class="overlay" id="cmodal" onclick="this.classList.remove('active')">
+  <div class="cmod" onclick="event.stopPropagation()">
+    <h3 class="cinzel" id="cmt"></h3>
+    <div class="ct" id="cmtx"></div>
+    <div class="cc" id="cmci"></div>
+    <button class="btn sm" onclick="document.getElementById('cmodal').classList.remove('active')" style="margin-top:14px">Close</button>
+  </div>
+</div>
+
+<div class="overlay dark" id="endscr">
+  <h1 class="cinzel" id="endt"></h1>
+  <div id="endn" style="max-width:560px;text-align:center;margin-bottom:1.5rem;color:var(--dim);line-height:1.6"></div>
+  <div id="endst" style="max-width:500px;width:90%;margin-bottom:1.5rem"></div>
+  <button class="btn p" onclick="location.reload()">Play Again</button>
+</div>
+
+<script>
+// === DATA ===
+const R={
+  na:{name:"North America",x:160,y:160,econ:30,mil:35,strat:8,owner:"usa"},
+  ca:{name:"Central America",x:150,y:260,econ:6,mil:2,strat:4,owner:null},
+  sa:{name:"South America",x:200,y:370,econ:12,mil:5,strat:3,owner:null},
+  weu:{name:"Western Europe",x:400,y:130,econ:28,mil:18,strat:7,owner:"eu"},
+  eeu:{name:"Eastern Europe",x:480,y:150,econ:10,mil:8,strat:6,owner:null},
+  rus:{name:"Russia",x:560,y:100,econ:14,mil:28,strat:7,owner:"russia"},
+  mena:{name:"Middle East",x:490,y:260,econ:18,mil:10,strat:9,owner:null},
+  afr:{name:"Africa",x:430,y:360,econ:8,mil:3,strat:3,owner:null},
+  sas:{name:"South Asia",x:570,y:280,econ:12,mil:14,strat:5,owner:null},
+  eas:{name:"East Asia",x:650,y:180,econ:26,mil:22,strat:8,owner:"china"},
+  sea:{name:"SE Asia",x:640,y:310,econ:14,mil:6,strat:6,owner:null},
+  oce:{name:"Oceania",x:700,y:410,econ:8,mil:4,strat:3,owner:null}
+};
+const CONN=[
+  ["na","ca",0],["na","weu",1],["na","eas",1],["na","sa",1],
+  ["ca","sa",0],["ca","mena",1],["sa","afr",1],
+  ["weu","eeu",0],["weu","afr",1],["weu","mena",1],
+  ["eeu","rus",0],["eeu","mena",0],
+  ["rus","eas",0],["rus","mena",0],["rus","sas",0],
+  ["mena","afr",0],["mena","sas",0],["afr","sas",1],
+  ["sas","eas",0],["sas","sea",0],["eas","sea",0],
+  ["sea","oce",1],["oce","eas",1],["oce","sa",1]
+];
+const N={
+  usa:{name:"United States",flag:"\ud83c\uddfa\ud83c\uddf8",color:"#3b82f6",home:"na",
+    desc:"Offshore balancer. Regional hegemon in the Western Hemisphere.",
+    mil:35,econ:30,intel:15,inf:20,
+    fl:"\"The US has a profound interest in seeing no peer competitor dominate either Europe or Northeast Asia.\""},
+  china:{name:"China",flag:"\ud83c\udde8\ud83c\uddf3",color:"#dc2626",home:"eas",
+    desc:"Rising peer competitor. Massive latent power converting to military capability.",
+    mil:22,econ:26,intel:10,inf:12,
+    fl:"\"If China continues to grow economically, it will attempt to dominate Asia the way the US dominates the Western Hemisphere.\""},
+  russia:{name:"Russia",flag:"\ud83c\uddf7\ud83c\uddfa",color:"#f97316",home:"rus",
+    desc:"Declining great power with massive nuclear arsenal and geographic depth.",
+    mil:28,econ:14,intel:12,inf:10,
+    fl:"\"Russia is a declining great power, but a declining great power with thousands of nuclear weapons is still extremely dangerous.\""},
+  eu:{name:"European Union",flag:"\ud83c\uddea\ud83c\uddfa",color:"#a78bfa",home:"weu",
+    desc:"Economic superpower, military question mark. Buck-passer extraordinaire.",
+    mil:18,econ:28,intel:10,inf:18,
+    fl:"\"Europe has been a first-rate buck-passer, free-riding on America's security guarantee since 1945.\""}
+};
+
+const CONCEPTS=[
+  {id:"anarchy",name:"Anarchy",desc:"The ordering principle of international politics. No world government exists above states to enforce rules or punish aggressors. Every state must ultimately rely on itself for survival.",cite:"Tragedy, Ch. 2: \"The most important feature of the international system is that it is anarchic.\"",trig:"start"},
+  {id:"self_help",name:"Self-Help",desc:"In anarchy, states cannot rely on others for their security. Alliances are temporary expedients. The system forces self-reliance.",cite:"Tragedy, Ch. 2: \"States must look after themselves because there is no higher authority they can turn to.\"",trig:"start"},
+  {id:"security_dilemma",name:"Security Dilemma",desc:"When one state increases its security, it automatically decreases the security of others. They cannot know your intentions with certainty, so they arm in response. A spiral neither side wants but neither can escape.",cite:"Tragedy, Ch. 2: \"Measures that enhance one state's security typically diminish the security of other states.\""},
+  {id:"offensive_realism",name:"Offensive Realism",desc:"States don't just want enough power to survive -- they seek to maximize their share of world power. The structure incentivizes expansion, not satisfaction with the status quo.",cite:"Tragedy, Ch. 1: \"The structure of the international system forces states which seek only to be secure nonetheless to act aggressively toward each other.\""},
+  {id:"relative_power",name:"Relative Power",desc:"What matters is not absolute power but how much you have compared to other great powers. This is why economic cooperation is dangerous -- relative gains can shift the balance.",cite:"Tragedy, Ch. 2: \"States are concerned mainly with relative power, not absolute power.\""},
+  {id:"latent_power",name:"Latent Power",desc:"The socioeconomic ingredients -- wealth, population, technology -- that can be converted to military capability. China's rise is threatening because of its vast latent power.",cite:"Tragedy, Ch. 3: \"Latent power refers to the socio-economic ingredients that go into building military power.\""},
+  {id:"stopping_power",name:"Stopping Power of Water",desc:"Large bodies of water are formidable barriers to power projection. This is why no state has achieved global hegemony. Water makes regional hegemony the practical ceiling.",cite:"Tragedy, Ch. 4: \"Large bodies of water sharply limit the power-projection capability of armies.\""},
+  {id:"regional_heg",name:"Regional Hegemony",desc:"The most a great power can realistically achieve. A regional hegemon then works to prevent any other state from achieving the same status elsewhere.",cite:"Tragedy, Ch. 5: \"The ideal situation for any great power is to be the only regional hegemon in the world.\""},
+  {id:"buck_passing",name:"Buck-Passing",desc:"Getting another state to bear the costs of checking a rising power while you free-ride. Rational but dangerous -- the buck-catcher might fail.",cite:"Tragedy, Ch. 8: \"Buck-passing is attractive because the buck-passer avoids the costs of fighting an aggressor.\""},
+  {id:"balancing",name:"Balancing",desc:"Building your own capability (internal) or forming alliances (external) to counter a rising threat. More reliable but more expensive than buck-passing.",cite:"Tragedy, Ch. 5: \"Threatened states can balance against an aggressor by building up their own capabilities.\""},
+  {id:"bandwagoning",name:"Bandwagoning",desc:"Aligning with the stronger side. Mearsheimer argues this is rare among great powers -- it amounts to trusting your survival to someone who could destroy you.",cite:"Tragedy, Ch. 5: \"Great powers rarely if ever bandwagon because doing so puts them at the mercy of a more powerful state.\""},
+  {id:"no_status_quo",name:"No Status Quo Powers",desc:"No genuinely satisfied great powers exist. Even content-looking states would grab more power if the price were right. The incentive to gain power never disappears.",cite:"Tragedy, Ch. 2: \"The best way to ensure their security is to achieve hegemony now.\""},
+  {id:"intentions",name:"Uncertainty of Intentions",desc:"States can never be certain about present or future intentions of others. A benign state today may become aggressive tomorrow. This irreducible uncertainty drives the tragedy.",cite:"Tragedy, Ch. 2: \"There is no way to know for certain what another state's intentions are.\""},
+  {id:"tragedy",name:"The Tragedy",desc:"Great power competition is tragic because it emerges from rational responses to structural incentives, not evil leaders. Even if every state wanted only security, anarchy and uncertainty would still drive competition. No one is to blame. Everyone suffers.",cite:"Tragedy, Ch. 1: \"The great powers are trapped in an iron cage where they have little choice but to compete with each other for power.\""},
+  {id:"offshore_bal",name:"Offshore Balancing",desc:"Mearsheimer's prescribed grand strategy: stay out unless a potential hegemon rises, then intervene to restore the balance. Let regional powers check each other.",cite:"The Great Delusion (2018): \"The best grand strategy for America is offshore balancing.\""},
+  {id:"liberal_heg",name:"Liberal Hegemony (Failure)",desc:"Post-Cold War American overreach: spreading democracy, integrating markets, building institutions. Doomed because nationalism and realism always reassert themselves. Iraq, Libya, Ukraine -- all consequences.",cite:"The Great Delusion, Ch. 6: \"Liberal hegemony is doomed to fail.\""},
+  {id:"nuclear_det",name:"Nuclear Deterrence / MAD",desc:"Nuclear weapons make great power war catastrophically costly. Weapons of total destruction are weapons of peace -- but only as long as deterrence holds.",cite:"Tragedy, Ch. 4-5: Nuclear weapons fundamentally alter the calculus of great power war."},
+  {id:"multipolarity",name:"Multipolarity & Instability",desc:"Three or more great powers = less stable. More conflict dyads, more miscalculation, more buck-passing, harder deterrence. The shift from unipolarity is structurally dangerous.",cite:"Tragedy, Ch. 9: \"Multipolar systems are more war-prone than bipolar systems.\""},
+  {id:"provocation",name:"Provocation & Blowback",desc:"Aggressive actions meant to increase security can provoke the very threats they were designed to prevent. NATO expansion recreated the adversary it claimed to guard against.",cite:"\"Why the Ukraine Crisis Is the West's Fault\" (Foreign Affairs, 2014)"}
+];
+
+const EVENTS=[
+  {id:"arms_race",type:"crisis",title:"Arms Race Spiral",desc:"{a} has dramatically increased military spending.",fx:(g,a)=>{eachAI(g,a,n=>n.mil+=3)},con:"security_dilemma"},
+  {id:"eco_boom",type:"gain",title:"Economic Boom",desc:"A technological revolution boosts {a}'s economic output.",fx:(g,a)=>{g.nations[a].econ+=8},con:"latent_power"},
+  {id:"ally_frac",type:"crisis",title:"Alliance Fracture",desc:"Burden-sharing disputes weaken {a}'s alliance commitments.",fx:(g,a)=>{g.nations[a].inf-=5},con:"buck_passing"},
+  {id:"proxy",type:"crisis",title:"Proxy Conflict Erupts",desc:"A regional war threatens great power confrontation.",mg:"proxy",con:"tragedy"},
+  {id:"nuke_scare",type:"crisis",title:"Nuclear False Alarm",desc:"Early warning detects a possible launch. You have seconds.",mg:"nuclear",con:"nuclear_det"},
+  {id:"brink",type:"crisis",title:"Brinkmanship Crisis",desc:"A confrontation over disputed territory is escalating.",mg:"brinkmanship",con:"intentions"},
+  {id:"intel_win",type:"gain",title:"Intelligence Windfall",desc:"Your agents uncovered a rival's posture -- but is it genuine?",mg:"fog",con:"intentions"},
+  {id:"regime",type:"crisis",title:"Regime Change",desc:"Revolution in a key state shifts the regional balance.",fx:(g,a)=>{const c=Object.keys(R).filter(r=>!R[r].owner&&g.regions[r].controller);if(c.length){const r=c[~~(Math.random()*c.length)];g.regions[r].controller=null;g.regions[r].mp={}}},con:"intentions"},
+  {id:"tech",type:"gain",title:"Military Tech Breakthrough",desc:"{a} achieves a significant advance in military technology.",fx:(g,a)=>{g.nations[a].mil+=5},con:"relative_power"},
+  {id:"eco_crash",type:"crisis",title:"Economic Crisis",desc:"Financial meltdown devastates {a}'s economy.",fx:(g,a)=>{g.nations[a].econ=Math.max(5,g.nations[a].econ-10)},con:"latent_power"},
+  {id:"lib_over",type:"crisis",title:"Liberal Hegemony Overreach",desc:"An intervention to promote democracy backfired spectacularly.",fx:(g,a)=>{g.nations[a].mil-=4;g.nations[a].inf-=6},con:"liberal_heg"},
+  {id:"naval",type:"crisis",title:"Naval Buildup",desc:"{a} expands its blue-water navy, challenging maritime dominance.",fx:(g,a)=>{g.nations[a].mil+=4},con:"stopping_power"},
+  {id:"coalition",type:"crisis",title:"Balancing Coalition Forms",desc:"Threatened states form a coalition against the most powerful.",fx:(g)=>{let s=null,m=0;Object.entries(g.nations).forEach(([k,v])=>{const p=v.mil+v.econ;if(p>m){m=p;s=k}});if(s)g.nations[s].inf-=8},con:"balancing"},
+  {id:"buckexp",type:"crisis",title:"Buck-Passing Exposed",desc:"A great power caught shifting security burdens to a weaker ally.",fx:(g,a)=>{g.nations[a].inf-=4},con:"buck_passing"},
+  {id:"natl_surge",type:"crisis",title:"Nationalist Surge",desc:"Nationalism in {a} makes diplomacy impossible and postures aggressive.",fx:(g,a)=>{g.nations[a].mil+=3;g.nations[a].inf-=3},con:"provocation"}
+];
+
+function eachAI(g,skip,fn){Object.entries(g.nations).forEach(([id,n])=>{if(id!==skip&&n.alive)fn(n,id)})}
+
+// === GAME STATE ===
+let G=null;
+let selNation=null;
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// Build nation grid
+(function(){
+  const grid=document.getElementById('ngrid');
+  Object.entries(N).forEach(([id,n])=>{
+    const d=document.createElement('div');
+    d.className='ncard';d.dataset.nation=id;
+    d.innerHTML=`<div class="flag">${n.flag}</div><h3 class="cinzel" style="color:${n.color}">${n.name}</h3>
+      <div class="st"><b>Mil:</b> ${n.mil} | <b>Econ:</b> ${n.econ} | <b>Intel:</b> ${n.intel} | <b>Influence:</b> ${n.inf}</div>
+      <div class="st">${n.desc}</div><div class="fl">${n.fl}</div>`;
+    d.onclick=()=>{selNation=id;go('diff')};
+    grid.appendChild(d);
+  });
+})();
+
+function startGame(diff){
+  G={
+    p:selNation, diff, year:2000, maxYear:2050, ap:3, maxAp:3,
+    nations:{}, regions:{}, sel:null, log:[], unlocked:new Set(["anarchy","self_help"]),
+    wars:[], tevts:[], mgq:[], score:{ww:0,wl:0,cs:0,rc:0,cu:2},
+    dm:diff==='normal'?1:diff==='hard'?1.4:1.8,
+    rel:{}, ww:{}
+  };
+  Object.entries(N).forEach(([id,n])=>{
+    G.nations[id]={mil:n.mil,econ:n.econ,intel:n.intel,inf:n.inf,nukes:(id==='usa'||id==='russia')?50:(id==='china'?20:5),alive:true};
+    G.ww[id]=0;
+  });
+  Object.entries(R).forEach(([id,r])=>{
+    G.regions[id]={controller:r.owner,mp:{},fort:false};
+    if(r.owner)G.regions[id].mp[r.owner]=r.mil;
+  });
+  Object.keys(N).forEach(a=>{G.rel[a]={};Object.keys(N).forEach(b=>{G.rel[a][b]=a===b?100:0})});
+  G.rel.usa.eu=30;G.rel.eu.usa=30;G.rel.usa.russia=-20;G.rel.russia.usa=-20;
+  G.rel.usa.china=-10;G.rel.china.usa=-10;G.rel.russia.china=10;G.rel.china.russia=10;
+  G.rel.eu.russia=-10;G.rel.russia.eu=-10;
+
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('game').classList.add('active');
+  renderAll();
+  addLog("The system is anarchic. No authority stands above states. The game begins.",""  );
+}
+
+// === RENDER ===
+function renderMap(){
+  const svg=document.getElementById('msvg');svg.innerHTML='';
+  CONN.forEach(([f,t,w])=>{
+    const r1=R[f],r2=R[t];
+    const l=document.createElementNS("http://www.w3.org/2000/svg","line");
+    l.setAttribute("x1",r1.x);l.setAttribute("y1",r1.y);l.setAttribute("x2",r2.x);l.setAttribute("y2",r2.y);
+    l.setAttribute("class",w?"cwater":"cline");svg.appendChild(l);
+  });
+  Object.entries(R).forEach(([id,r])=>{
+    const g=document.createElementNS("http://www.w3.org/2000/svg","g");
+    g.setAttribute("class","rnode"+(G.sel===id?" sel":""));
+    g.onclick=()=>selReg(id);
+    g.onmouseenter=e=>showTT(e,id);g.onmouseleave=hideTT;
+    const ctrl=G.regions[id].controller;
+    let fc="#2a2f3a",sc="#3a4050";
+    if(ctrl){fc=N[ctrl].color+"33";sc=N[ctrl].color}
+    const rad=18+r.strat*2;
+    const hex=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+    const pts=[];for(let i=0;i<6;i++){const a=(Math.PI/3)*i-Math.PI/6;pts.push(`${r.x+rad*Math.cos(a)},${r.y+rad*Math.sin(a)}`)}
+    hex.setAttribute("points",pts.join(" "));hex.setAttribute("fill",fc);hex.setAttribute("stroke",sc);hex.setAttribute("class","nbg");
+    g.appendChild(hex);
+    const lb=document.createElementNS("http://www.w3.org/2000/svg","text");
+    lb.setAttribute("x",r.x);lb.setAttribute("y",r.y-3);lb.setAttribute("class","rlbl");
+    lb.textContent=r.name.length>14?r.name.slice(0,12)+'...':r.name;g.appendChild(lb);
+    const pr=G.regions[id].mp;const tm=Object.values(pr).reduce((a,b)=>a+b,0);
+    if(tm>0){const p=document.createElementNS("http://www.w3.org/2000/svg","text");p.setAttribute("x",r.x);p.setAttribute("y",r.y+12);p.setAttribute("class","rpow");p.textContent='\u2694'+tm;g.appendChild(p)}
+    if(ctrl){const f=document.createElementNS("http://www.w3.org/2000/svg","text");f.setAttribute("x",r.x+rad-5);f.setAttribute("y",r.y-rad+12);f.setAttribute("font-size","12");f.setAttribute("text-anchor","middle");f.textContent=N[ctrl].flag;g.appendChild(f)}
+    svg.appendChild(g);
+  });
+}
+
+function renderLeft(){
+  const ap=G.ap,s=G.sel,p=G.p,n=G.nations[p];
+  const sn=s?R[s].name:'';const snShort=sn.length>10?sn.slice(0,10)+'...':sn;
+  document.getElementById('left').innerHTML=`
+    <h4>Strategic Actions</h4>
+    <button class="abtn" onclick="act('bm')" ${ap<1?'disabled':''}><span>&#9876; Build Military</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('be')" ${ap<1?'disabled':''}><span>&#128176; Build Economy</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('bi')" ${ap<1?'disabled':''}><span>&#128269; Expand Intel</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('cl')" ${ap<1||n.econ<8?'disabled':''}><span>&#127981; Convert Latent Power</span><span class="c">1AP+8&#128176;</span></button>
+    <h4>Force Projection</h4>
+    <button class="abtn" onclick="act('dep')" ${ap<1||!s?'disabled':''}><span>&#128640; Deploy${s?' to '+snShort:' (select)'}</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('fort')" ${ap<1||!s||G.regions[s]?.controller!==p?'disabled':''}><span>&#127984; Fortify Region</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('atk')" ${ap<1||!s||G.regions[s]?.controller===p?'disabled':''}><span>&#128128; Coerce/Attack${s?' '+snShort:''}</span><span class="c">1 AP</span></button>
+    <h4>Diplomacy</h4>
+    <button class="abtn" onclick="act('bp')" ${ap<1?'disabled':''}><span>&#129309; Buck-Pass</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('ally')" ${ap<1?'disabled':''}><span>&#128220; Form Alliance</span><span class="c">1 AP</span></button>
+    <button class="abtn" onclick="act('spy')" ${ap<1||!s?'disabled':''}><span>&#128373; Espionage${s?' in '+snShort:''}</span><span class="c">1 AP</span></button>
+    <h4>Nuclear</h4>
+    <button class="abtn" onclick="act('nuke')" ${ap<2||n.econ<10?'disabled':''} style="border-color:rgba(239,68,68,.3)"><span>&#9762; Expand Arsenal</span><span class="c">2AP+10&#128176;</span></button>`;
+}
+
+function renderRight(){
+  const s=G.sel,p=G.p;let h='<h4>Power Balance</h4>';
+  const pws=Object.entries(G.nations).filter(([,n])=>n.alive).map(([id,n])=>({id,total:n.mil+n.econ,mil:n.mil,econ:n.econ})).sort((a,b)=>b.total-a.total);
+  const mx=Math.max(...pws.map(p=>p.total));
+  pws.forEach(pw=>{
+    const ip=pw.id===p;
+    h+=`<div style="${ip?'border-left:2px solid '+N[pw.id].color+';padding-left:5px':''}">
+      <div class="pblbl"><span>${N[pw.id].flag} ${N[pw.id].name}${ip?' (YOU)':''}</span><span style="color:${N[pw.id].color}">${pw.total}</span></div>
+      <div class="pbar"><div class="pfill" style="width:${pw.total/mx*100}%;background:${N[pw.id].color}"></div></div></div>`;
+  });
+  h+='<h4>Relations</h4>';
+  Object.entries(G.nations).forEach(([id,n])=>{
+    if(id===p||!n.alive)return;
+    const r=G.rel[p][id];let rl,rc;
+    if(r>20){rl='Friendly';rc='var(--success)'}else if(r>-20){rl='Neutral';rc='var(--dim)'}else if(r>-50){rl='Hostile';rc='var(--warn)'}else{rl='Adversarial';rc='var(--danger)'}
+    h+=`<div class="irow"><span class="l">${N[id].flag} ${N[id].name}</span><span class="v" style="color:${rc}">${rl} (${r>0?'+':''}${r})</span></div>`;
+  });
+  if(s){
+    const r=R[s],rs=G.regions[s];
+    h+=`<h4>${r.name}</h4>`;
+    h+=`<div class="irow"><span class="l">Controller</span><span class="v">${rs.controller?N[rs.controller].flag+' '+N[rs.controller].name:'Contested'}</span></div>`;
+    h+=`<div class="irow"><span class="l">Econ Value</span><span class="v" style="color:var(--success)">${r.econ}</span></div>`;
+    h+=`<div class="irow"><span class="l">Strategic</span><span class="v" style="color:var(--warn)">${r.strat}</span></div>`;
+    h+=`<div class="irow"><span class="l">Fortified</span><span class="v">${rs.fort?'Yes':'No'}</span></div>`;
+    const mp=rs.mp;if(Object.keys(mp).length>0){
+      h+='<div style="margin-top:4px;font-size:.75rem;color:var(--dim)">Military:</div>';
+      Object.entries(mp).forEach(([nid,m])=>{h+=`<div class="irow"><span class="l">${N[nid].flag}</span><span class="v" style="color:${N[nid].color}">${m}</span></div>`});
+    }
+    const adj=CONN.filter(c=>c[0]===s||c[1]===s).map(c=>{const o=c[0]===s?c[1]:c[0];return{id:o,name:R[o].name,w:c[2]}});
+    h+='<div style="margin-top:6px;font-size:.73rem;color:var(--dim)">Adjacent:</div>';
+    adj.forEach(a=>{h+=`<div style="font-size:.72rem;padding:1px 0;cursor:pointer" onclick="selReg('${a.id}')">${a.w?'\ud83c\udf0a ':'&rarr; '}${a.name}</div>`});
+  }
+  document.getElementById('right').innerHTML=h;
+}
+
+function renderTop(){
+  const n=G.nations[G.p];
+  document.getElementById('yd').textContent=G.year;
+  document.getElementById('apd').textContent=G.ap;
+  document.getElementById('mild').textContent=n.mil;
+  document.getElementById('ecod').textContent=n.econ;
+  document.getElementById('intd').textContent=n.intel;
+  document.getElementById('infd').textContent=n.inf;
+}
+
+function renderConcepts(){
+  const g=document.getElementById('cgrid');g.innerHTML='';
+  CONCEPTS.forEach(c=>{
+    const u=G.unlocked.has(c.id);const t=document.createElement('div');
+    t.className='ctag'+(u?' u':'');t.textContent=u?c.name:'???';
+    if(u)t.onclick=()=>showConcept(c);g.appendChild(t);
+  });
+}
+
+function renderAll(){renderMap();renderLeft();renderRight();renderTop();renderConcepts()}
+function addLog(t,cls=''){
+  const e=document.createElement('div');e.className='lentry '+cls;
+  e.innerHTML=`<span class="ly">[${G.year}]</span> ${t}`;
+  const c=document.getElementById('logc');c.prepend(e);
+  while(c.children.length>40)c.removeChild(c.lastChild);
+}
+
+function selReg(id){G.sel=G.sel===id?null:id;renderAll()}
+function showTT(e,id){
+  const tt=document.getElementById('rtt'),r=R[id],rs=G.regions[id];
+  const ctrl=rs.controller?N[rs.controller].name:'Contested';
+  tt.innerHTML=`<b>${r.name}</b><br>Controller: ${ctrl}<br>Econ: ${r.econ} | Strat: ${r.strat}${rs.fort?'<br>Fortified':''}`;
+  tt.style.display='block';
+  const rect=document.getElementById('maparea').getBoundingClientRect();
+  tt.style.left=(e.clientX-rect.left+10)+'px';tt.style.top=(e.clientY-rect.top+10)+'px';
+}
+function hideTT(){document.getElementById('rtt').style.display='none'}
+
+function unlock(id){if(!G.unlocked.has(id)){G.unlocked.add(id);G.score.cu++;const c=CONCEPTS.find(x=>x.id===id);if(c)addLog(`THEORY UNLOCKED: ${c.name}`,"theory");renderConcepts()}}
+function showConcept(c){document.getElementById('cmt').textContent=c.name;document.getElementById('cmtx').textContent=c.desc;document.getElementById('cmci').textContent=c.cite;document.getElementById('cmodal').classList.add('active')}
+function showTheory(){
+  // Show a full theory panel in the minigame overlay
+  let h='<div style="max-height:60vh;overflow-y:auto">';
+  CONCEPTS.forEach(c=>{
+    const u=G.unlocked.has(c.id);
+    h+=`<div style="padding:10px;margin-bottom:6px;background:var(--bg3);border-radius:4px;border-left:3px solid ${u?'var(--purple)':'var(--border)'}">
+      <div style="font-weight:700;${u?'color:var(--purple)':'color:var(--dim)'}">${u?c.name:'??? (Locked)'}</div>
+      ${u?`<div style="font-size:.83rem;color:var(--text);line-height:1.5;margin-top:4px">${c.desc}</div><div style="font-size:.75rem;color:var(--dim);font-style:italic;margin-top:4px">${c.cite}</div>`:'<div style="font-size:.8rem;color:var(--dim)">Keep playing to unlock this concept.</div>'}
+    </div>`;
+  });
+  h+=`</div><div style="text-align:center;margin-top:12px"><button class="btn sm" onclick="document.getElementById('mgov').classList.remove('active')">Close</button></div>`;
+  document.getElementById('mgt').textContent='Mearsheimer\'s Framework';
+  document.getElementById('mgs').textContent=G.unlocked.size+' / '+CONCEPTS.length+' concepts unlocked';
+  document.getElementById('mgc').innerHTML=h;
+  document.getElementById('mgov').classList.add('active');
+}
+
+// === ACTIONS ===
+function act(a){
+  if(G.ap<=0)return;
+  const p=G.p,n=G.nations[p],s=G.sel;
+  switch(a){
+    case 'bm':n.mil+=5;G.ap--;addLog("Military buildup: +5","gain");unlock("security_dilemma");aiReactMil(p);break;
+    case 'be':n.econ+=5;G.ap--;addLog("Economic investment: +5","gain");unlock("latent_power");break;
+    case 'bi':n.intel+=4;G.ap--;addLog("Intel expansion: +4","gain");break;
+    case 'cl':if(n.econ<8)return;n.econ-=8;n.mil+=6;G.ap--;addLog("Converted latent power: -8 econ to +6 mil","gain");unlock("latent_power");break;
+    case 'dep':if(!s)return;deploy(s);break;
+    case 'fort':if(!s||G.regions[s].controller!==p)return;G.regions[s].fort=true;G.ap--;addLog(`Fortified ${R[s].name}`,"gain");break;
+    case 'atk':if(!s||G.regions[s].controller===p)return;attack(s);break;
+    case 'bp':buckPass();break;
+    case 'ally':alliance();break;
+    case 'spy':if(!s)return;espionage(s);break;
+    case 'nuke':if(G.ap<2||n.econ<10)return;n.nukes+=10;n.econ-=10;G.ap-=2;addLog("Nuclear arsenal expanded: +10 warheads","crisis");unlock("nuclear_det");aiReactNuke(p);break;
+  }
+  renderAll();
+}
+
+function isWaterTo(from,to){const c=CONN.find(x=>(x[0]===from&&x[1]===to)||(x[1]===from&&x[0]===to));return c?c[2]:1}
+function hasLandRoute(nid,tgt){
+  const ctrl=Object.keys(G.regions).filter(r=>G.regions[r].controller===nid);
+  ctrl.push(N[nid].home);
+  for(const r of ctrl){if(CONN.find(c=>((c[0]===r&&c[1]===tgt)||(c[1]===r&&c[0]===tgt))&&!c[2]))return true}
+  return false;
+}
+
+function deploy(rid){
+  const p=G.p,n=G.nations[p];
+  const water=!hasLandRoute(p,rid);
+  const amt=water?3:5;
+  if(n.mil<amt){addLog("Insufficient military to deploy","crisis");return}
+  n.mil-=amt;if(!G.regions[rid].mp[p])G.regions[rid].mp[p]=0;G.regions[rid].mp[p]+=amt;G.ap--;
+  if(water){addLog(`Deployed ${amt} to ${R[rid].name} (water penalty)`,"");unlock("stopping_power")}
+  else addLog(`Deployed ${amt} to ${R[rid].name}`,"gain");
+  checkCtrl(rid);
+}
+
+function checkCtrl(rid){
+  const rs=G.regions[rid];if(rs.controller)return;
+  let mx=0,mn=null;Object.entries(rs.mp).forEach(([id,m])=>{if(m>mx){mx=m;mn=id}});
+  if(mx>=5&&Object.keys(rs.mp).length===1){rs.controller=mn;addLog(`${N[mn].name} controls ${R[rid].name}`,mn===G.p?"gain":"crisis")}
+}
+
+function attack(rid){
+  const p=G.p,n=G.nations[p],rs=G.regions[rid],def=rs.controller;
+  const myF=rs.mp[p]||0;
+  if(myF<3){addLog(`Need 3+ deployed forces in ${R[rid].name}`,"crisis");return}
+  G.ap--;
+  if(!def){rs.controller=p;addLog(`Seized ${R[rid].name}`,"gain");unlock("offensive_realism");checkWin();renderAll();return}
+  const defF=(rs.mp[def]||0)+(rs.fort?5:0);
+  const aR=myF+~~(Math.random()*6),dR=defF+~~(Math.random()*6);
+  if(aR>dR){
+    const loss=~~(defF*.4);rs.mp[p]=Math.max(1,myF-loss);delete rs.mp[def];rs.controller=p;rs.fort=false;
+    addLog(`Conquered ${R[rid].name}! Beat ${N[def].name}. Lost ${loss}.`,"gain");
+    G.rel[p][def]-=20;G.rel[def][p]-=20;G.ww[p]+=3;G.score.ww++;
+    unlock("offensive_realism");unlock("tragedy");aiReactWar(p,def);
+  } else {
+    const loss=~~(myF*.5);rs.mp[p]=Math.max(0,myF-loss);if(!rs.mp[p])delete rs.mp[p];
+    addLog(`Failed to take ${R[rid].name}. Lost ${loss} vs ${N[def].name}.`,"crisis");
+    G.rel[p][def]-=15;G.rel[def][p]-=15;G.ww[p]+=5;G.score.wl++;
+  }
+  checkWin();
+}
+
+function buckPass(){
+  G.ap--;
+  const threats=Object.entries(G.nations).filter(([id])=>id!==G.p&&G.nations[id].alive).sort((a,b)=>(b[1].mil+b[1].econ)-(a[1].mil+a[1].econ));
+  if(threats.length<2){addLog("No buck-passing targets","crisis");return}
+  const threat=threats[0],catcher=threats[1];
+  G.rel[G.p][catcher[0]]+=10;G.rel[catcher[0]][G.p]+=5;catcher[1].mil+=3;
+  if(Math.random()<.3*G.dm){G.nations[G.p].inf-=4;addLog(`Buck-passing exposed! Lost credibility pushing ${N[catcher[0]].name} against ${N[threat[0]].name}`,"crisis")}
+  else addLog(`Redirected ${N[catcher[0]].name} to balance ${N[threat[0]].name}`,"gain");
+  unlock("buck_passing");
+}
+
+function alliance(){
+  G.ap--;
+  let best=null,br=-100;
+  Object.entries(G.rel[G.p]).forEach(([id,r])=>{if(id!==G.p&&G.nations[id]?.alive&&r>br){br=r;best=id}});
+  if(!best||br<-30){addLog("No willing alliance partners","crisis");return}
+  G.rel[G.p][best]+=15;G.rel[best][G.p]+=10;G.nations[G.p].inf+=3;
+  addLog(`Alliance strengthened with ${N[best].name} (${G.rel[G.p][best]})`,"gain");
+  unlock("balancing");
+  Object.keys(G.nations).forEach(id=>{if(id!==G.p&&id!==best){G.rel[id][G.p]-=5;G.rel[id][best]-=3}});
+  unlock("security_dilemma");
+}
+
+function espionage(rid){
+  G.ap--;const n=G.nations[G.p];
+  if(Math.random()<.4+n.intel/100){
+    const rs=G.regions[rid];let info=[];
+    Object.entries(rs.mp).forEach(([nid,m])=>info.push(`${N[nid].flag} ${m}`));
+    if(!info.length)info.push("No presence");
+    addLog(`Intel on ${R[rid].name}: ${info.join(', ')}`,"gain");n.intel+=2;unlock("intentions");
+  } else {
+    addLog(`Espionage in ${R[rid].name} failed -- agents compromised`,"crisis");
+    const ctrl=G.regions[rid].controller;if(ctrl)G.rel[ctrl][G.p]-=10;
+  }
+}
+
+// === AI ===
+function aiTurn(){Object.entries(G.nations).forEach(([id,n])=>{if(id!==G.p&&n.alive)aiNation(id,n)})}
+function aiNation(id,n){
+  const acts=2+~~G.dm;
+  for(let i=0;i<acts;i++){
+    const pp=G.nations[G.p],pr=n.mil+n.econ,ppr=pp.mil+pp.econ,ratio=pr/Math.max(1,ppr);
+    let strat;
+    if(ratio<.7)strat=Math.random()<.6?'bm':'be';
+    else if(ratio>1.3&&G.rel[id][G.p]<-10)strat=Math.random()<.5?'exp':'bm';
+    else{const r=Math.random();strat=r<.35?'bm':r<.6?'be':r<.75?'exp':r<.85?'bal':'be'}
+    switch(strat){
+      case 'bm':n.mil+=3+~~(Math.random()*3);break;
+      case 'be':n.econ+=3+~~(Math.random()*3);break;
+      case 'exp':{
+        const home=N[id].home;const ctrl=Object.keys(G.regions).filter(r=>G.regions[r].controller===id);
+        const adj=new Set();[...ctrl,home].forEach(reg=>{CONN.forEach(([a,b,w])=>{const o=a===reg?b:(b===reg?a:null);if(o&&!ctrl.includes(o)&&!w)adj.add(o)})});
+        const tgts=[...adj].filter(r=>{const rs=G.regions[r];const op=Object.entries(rs.mp).filter(([nid])=>nid!==id).reduce((a,[,v])=>a+v,0);return!rs.controller||op<n.mil*.3});
+        if(tgts.length){
+          const tgt=tgts[~~(Math.random()*tgts.length)];const da=Math.min(n.mil,4+~~(Math.random()*4));n.mil-=da;
+          if(!G.regions[tgt].mp[id])G.regions[tgt].mp[id]=0;G.regions[tgt].mp[id]+=da;
+          const rs=G.regions[tgt];const mf=rs.mp[id];const df=rs.controller?(rs.mp[rs.controller]||0)+(rs.fort?5:0):0;
+          if(!rs.controller&&mf>=5){rs.controller=id;addLog(`${N[id].name} seized ${R[tgt].name}`,"crisis")}
+          else if(rs.controller&&rs.controller!==id&&mf>df*1.2){const oc=rs.controller;rs.controller=id;rs.fort=false;delete rs.mp[oc];addLog(`${N[id].name} conquered ${R[tgt].name} from ${N[oc].name}!`,"crisis");G.rel[id][oc]-=20}
+        }
+        break;
+      }
+      case 'bal':{const st=Object.entries(G.nations).filter(([nid])=>nid!==id).sort((a,b)=>(b[1].mil+b[1].econ)-(a[1].mil+a[1].econ))[0];if(st){G.rel[id][st[0]]-=5;n.mil+=2}break}
+    }
+  }
+}
+
+function aiReactMil(b){eachAI(G,b,(n,id)=>{G.rel[id][b]-=3;if(Math.random()<.4*G.dm)n.mil+=2})}
+function aiReactNuke(b){eachAI(G,b,(n,id)=>{G.rel[id][b]-=8;if(n.nukes<10&&Math.random()<.5){n.nukes+=5;n.econ-=5;addLog(`${N[id].name} expands nuclear arsenal in response`,"crisis")}})}
+function aiReactWar(agg,vic){eachAI(G,agg,(n,id)=>{if(id===vic)return;G.rel[id][agg]-=10;G.rel[id][vic]+=5;if(Math.random()<.3*G.dm){n.mil+=3;addLog(`${N[id].name} increases readiness after the war`,"")}});unlock("provocation")}
+
+// === TURN ===
+function endTurn(){
+  G.tevts=[];G.mgq=[];
+  aiTurn();
+  // Income
+  Object.entries(G.nations).forEach(([id,n])=>{if(!n.alive)return;const inc=Object.entries(G.regions).filter(([,r])=>r.controller===id).reduce((s,[rid])=>s+~~(R[rid].econ*.2),0);n.econ+=inc;if(G.ww[id]>0)G.ww[id]=Math.max(0,G.ww[id]-1)});
+  // Events
+  const ne=1+(Math.random()<.4?1:0);
+  for(let i=0;i<ne;i++){
+    if(Math.random()>.55)continue;
+    const ev=EVENTS[~~(Math.random()*EVENTS.length)];
+    const ns=Object.keys(G.nations).filter(id=>G.nations[id].alive);
+    const actor=ns[~~(Math.random()*ns.length)];
+    if(ev.mg){G.mgq.push({ev,actor});G.tevts.push({tt:ev.title,td:ev.desc.replace('{a}',N[actor]?.name||'A power'),cls:'cr',mg:true})}
+    else if(ev.fx){ev.fx(G,actor);G.tevts.push({tt:ev.title,td:ev.desc.replace('{a}',N[actor]?.name||'A power'),cls:ev.type==='crisis'?'cr':'gn'});addLog(ev.desc.replace('{a}',N[actor]?.name||'A power'),ev.type)}
+    if(ev.con)unlock(ev.con);
+  }
+  G.year++;G.ap=G.maxAp;
+  checkStateUnlocks();
+  if(G.year>G.maxYear){endGame();return}
+  showTurnSum();
+}
+
+function checkStateUnlocks(){
+  const pp=G.nations[G.p].mil+G.nations[G.p].econ;
+  const maxAI=Math.max(...Object.entries(G.nations).filter(([id])=>id!==G.p).map(([,n])=>n.mil+n.econ));
+  if(pp>maxAI*1.3)unlock("offensive_realism");if(pp>maxAI*1.5)unlock("regional_heg");
+  const pc=Object.values(G.regions).filter(r=>r.controller===G.p).length;
+  if(pc>=4)unlock("relative_power");if(pc>=6)unlock("no_status_quo");
+  if(Object.values(G.nations).filter(n=>n.alive).length>=3&&G.year>=2010)unlock("multipolarity");
+  if(G.year>=2010)unlock("relative_power");if(G.year>=2020)unlock("no_status_quo");
+  if(G.year>=2030)unlock("tragedy");if(G.year>=2025&&G.nations.usa?.inf>20)unlock("liberal_heg");
+  if(G.p==='usa'){const uc=Object.entries(G.regions).filter(([id,r])=>r.controller==='usa');if(uc.every(([id])=>['na','ca','sa'].includes(id))&&uc.length>=2)unlock("offshore_bal")}
+}
+
+function showTurnSum(){
+  if(!G.tevts.length&&!G.mgq.length){renderAll();return}
+  const ov=document.getElementById('turnov');
+  document.getElementById('tot').textContent=`Year ${G.year} \u2014 Intelligence Briefing`;
+  const c=document.getElementById('tevts');c.innerHTML='';
+  G.tevts.forEach(e=>{const d=document.createElement('div');d.className=`tevt ${e.cls}`;d.innerHTML=`<div class="tt">${e.tt}${e.mg?' \u26a0\ufe0f':''}</div><div class="td">${e.td}</div>`;c.appendChild(d)});
+  ov.classList.add('active');
+  document.getElementById('tcb').onclick=()=>{ov.classList.remove('active');if(G.mgq.length)processMGQ();else renderAll()};
+}
+
+// === MINI-GAMES ===
+function processMGQ(){if(!G.mgq.length){renderAll();return}const{ev,actor}=G.mgq.shift();switch(ev.mg){case'brinkmanship':mgBrink(actor);break;case'fog':mgFog(actor);break;case'nuclear':mgNuke(actor);break;case'proxy':mgProxy(actor);break;default:processMGQ()}}
+function showMG(t,s,h){document.getElementById('mgt').textContent=t;document.getElementById('mgs').textContent=s;document.getElementById('mgc').innerHTML=h;document.getElementById('mgov').classList.add('active')}
+function closeMG(){document.getElementById('mgov').classList.remove('active');processMGQ()}
+
+// --- BRINKMANSHIP ---
+let BK={};
+function mgBrink(actor){
+  const opp=actor===G.p?Object.keys(G.nations).filter(id=>id!==G.p&&G.nations[id].alive)[0]:actor;
+  BK={pt:0,ot:0,rd:1,mx:6,opp,done:false};
+  showMG('\u26a1 BRINKMANSHIP CRISIS',`Confrontation with ${N[opp].name}. Push too far = war. Back down = credibility lost.`,rBrink());
+}
+function rBrink(){
+  const s=BK,tot=s.pt+s.ot,dng=tot>50;
+  return `<div class="mono" style="text-align:center;color:var(--dim);margin-bottom:6px">Round ${s.rd}/${s.mx} ${dng?'\u26a0\ufe0f DANGER':''}</div>
+  <div class="brkmeter" ${dng?'style="border:1px solid var(--danger)"':''}>
+    <div class="brkdz"></div><div class="brkcl"></div>
+    <div class="brkfl l" style="width:${s.pt/2}%;background:${N[G.p].color}40"></div>
+    <div class="brkfl r" style="width:${s.ot/2}%;background:${N[s.opp].color}40"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:.78rem;color:var(--dim)">
+    <span>${N[G.p].flag} You: ${s.pt}</span><span>Total: ${tot}/80</span><span>${N[s.opp].flag} Them: ${s.ot}</span>
+  </div>
+  <div style="text-align:center;margin:10px 0;min-height:36px" id="bkst">${s.done?'':'Each escalation raises tension. 80 = war.'}</div>
+  ${s.done?`<div style="text-align:center"><button class="btn p" onclick="closeMG()">Continue</button></div>`:`
+  <div style="display:flex;justify-content:space-between;margin-top:12px">
+    <button class="btn d" onclick="bkEsc()">\u2b06 Escalate (+${10+s.rd*2})</button>
+    <button class="btn" onclick="bkHold()">\u270a Hold (+${3+s.rd})</button>
+    <button class="btn w" onclick="bkBack()">\u2b07 Back Down</button>
+  </div>`}`;
+}
+function bkOppMove(){const s=BK,tot=s.pt+s.ot,agg=.3+G.dm*.15;if(tot>60&&Math.random()>agg)s.ot+=1;else if(s.pt>s.ot+10)s.ot+=8+~~(Math.random()*6);else s.ot+=4+~~(Math.random()*(s.rd*2))}
+function bkEsc(){BK.pt+=10+BK.rd*2;bkOppMove();if(BK.pt+BK.ot>=80){bkWar();return}BK.rd++;if(BK.rd>BK.mx){BK.pt>BK.ot?bkWin("You pushed harder. They back down."):bkLose("Neither blinked. Tensions remain extreme.");return}document.getElementById('mgc').innerHTML=rBrink()}
+function bkHold(){BK.pt+=3+BK.rd;bkOppMove();if(BK.pt+BK.ot>=80){bkWar();return}BK.rd++;if(BK.rd>BK.mx){bkWin("Both hold. Tense status quo.");return}document.getElementById('mgc').innerHTML=rBrink()}
+function bkBack(){bkLose("You backed down. Credibility lost, war averted.")}
+function bkWar(){
+  BK.done=true;G.nations[G.p].mil-=10;G.nations[BK.opp].mil-=10;G.ww[G.p]+=10;G.rel[G.p][BK.opp]-=30;
+  addLog(`CATASTROPHE: Brinkmanship with ${N[BK.opp].name} escalated to war!`,"crisis");unlock("tragedy");
+  document.getElementById('mgc').innerHTML=rBrink();
+  document.getElementById('bkst').innerHTML=`<span style="color:var(--danger);font-weight:700">\ud83d\udca5 WAR! Rational actors, catastrophic outcome. The tragedy in action.</span>`;
+}
+function bkWin(msg){
+  BK.done=true;G.nations[G.p].inf+=5;G.rel[G.p][BK.opp]-=10;G.score.cs++;
+  addLog(`Brinkmanship won vs ${N[BK.opp].name}: ${msg}`,"gain");
+  document.getElementById('mgc').innerHTML=rBrink();
+  document.getElementById('bkst').innerHTML=`<span style="color:var(--success)">${msg}</span>`;
+}
+function bkLose(msg){
+  BK.done=true;G.nations[G.p].inf-=6;G.rel[G.p][BK.opp]-=5;
+  addLog(`Brinkmanship lost: ${msg}`,"crisis");unlock("intentions");
+  document.getElementById('mgc').innerHTML=rBrink();
+  document.getElementById('bkst').innerHTML=`<span style="color:var(--warn)">${msg}</span>`;
+}
+
+// --- FOG OF WAR ---
+let FG={};
+function mgFog(actor){
+  // Generate intel cards - mix of real and deceptive intelligence
+  const nations=Object.keys(G.nations).filter(id=>id!==G.p&&G.nations[id].alive);
+  const target=nations[~~(Math.random()*nations.length)];
+  const tn=G.nations[target];
+  const realMil=tn.mil;
+  const realNukes=tn.nukes;
+  const isBuilding=Math.random()>.5;
+
+  // Create 16 intel cards - some real, some deceptive
+  const cards=[];
+  const signals=[
+    {text:`${N[target].name} mil spending +${~~(realMil*.15)}`,real:true,type:'mil'},
+    {text:`Satellite: ${~~(realMil*.8)}-${~~(realMil*1.2)} active divisions`,real:true,type:'mil'},
+    {text:`Nuclear stockpile est: ${~~(realNukes*.9)}-${~~(realNukes*1.1)}`,real:true,type:'nuke'},
+    {text:`HUMINT: ${isBuilding?'Offensive':'Defensive'} posture confirmed`,real:true,type:'posture'},
+    {text:`Diplomatic cables: ${isBuilding?'Aggressive':'Cautious'} language noted`,real:true,type:'posture'},
+    {text:`Economic data: GDP growth ${(2+Math.random()*4).toFixed(1)}%`,real:true,type:'econ'},
+    // Deceptive
+    {text:`${N[target].name} mil spending +${~~(realMil*.5)} (massive)`,real:false,type:'mil'},
+    {text:`Unverified: Secret weapons program detected`,real:false,type:'nuke'},
+    {text:`Defector claims: Invasion plans for ${R[Object.keys(R)[~~(Math.random()*12)]].name}`,real:false,type:'posture'},
+    {text:`Intercepted comms: "Phase 2 begins March"`,real:false,type:'posture'},
+    {text:`Analyst memo: Regime instability imminent`,real:false,type:'econ'},
+    {text:`Planted leak: Alliance with ${N[nations.find(n=>n!==target)||nations[0]].name} forming`,real:false,type:'diplo'},
+    // Ambiguous
+    {text:`Troop movements near border (exercises?)`,real:Math.random()>.5,type:'mil'},
+    {text:`Naval deployment to disputed waters`,real:Math.random()>.5,type:'mil'},
+    {text:`Arms deal with third party confirmed`,real:Math.random()>.5,type:'mil'},
+    {text:`Leadership rhetoric increasingly hawkish`,real:Math.random()>.5,type:'posture'},
+  ];
+
+  // Shuffle and take 12
+  for(let i=signals.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[signals[i],signals[j]]=[signals[j],signals[i]]}
+  const use=signals.slice(0,12);
+
+  FG={cards:use.map((s,i)=>({...s,revealed:false,idx:i})),flips:0,maxFlips:5,target,isBuilding,answered:false};
+
+  showMG('\ud83d\udd0d FOG OF WAR',`Intelligence assessment on ${N[target].name}. Flip up to ${FG.maxFlips} cards. Separate signal from deception.`,rFog());
+}
+function rFog(){
+  const s=FG;
+  let h=`<div class="mono" style="text-align:center;color:var(--warn);margin-bottom:8px">Flips: ${s.flips}/${s.maxFlips} remaining: ${s.maxFlips-s.flips}</div>`;
+  h+='<div class="fgrid">';
+  s.cards.forEach((c,i)=>{
+    if(c.revealed){
+      const col=c.real?'var(--success)':c.real===false?'var(--danger)':'var(--warn)';
+      h+=`<div class="fcard rev" style="border-color:${col};font-size:.72rem">${c.text}</div>`;
+    } else {
+      h+=`<div class="fcard" onclick="fogFlip(${i})"><span style="font-size:1.3rem">\u2753</span></div>`;
+    }
+  });
+  h+='</div>';
+  if(!s.answered){
+    h+=`<div style="text-align:center;margin:14px 0;font-size:.92rem">Based on your intelligence, what is ${N[s.target].name}'s posture?</div>`;
+    h+=`<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn d sm" onclick="fogAnswer('off')">Offensive (Preparing to attack)</button>
+      <button class="btn sm" onclick="fogAnswer('def')">Defensive (Status quo)</button>
+      <button class="btn w sm" onclick="fogAnswer('unk')">Uncertain (Need more intel)</button>
+    </div>`;
+  }
+  return h;
+}
+function fogFlip(i){
+  if(FG.flips>=FG.maxFlips||FG.cards[i].revealed||FG.answered)return;
+  FG.cards[i].revealed=true;FG.flips++;
+  document.getElementById('mgc').innerHTML=rFog();
+}
+function fogAnswer(ans){
+  FG.answered=true;
+  const correct=(ans==='off'&&FG.isBuilding)||(ans==='def'&&!FG.isBuilding);
+  const uncertain=ans==='unk';
+  let result;
+  if(correct){
+    G.nations[G.p].intel+=5;G.score.cs++;
+    result=`<div style="color:var(--success);font-weight:700;text-align:center;margin:12px 0">CORRECT. Your assessment matches ground truth. +5 intel.</div>`;
+    addLog(`Intel assessment on ${N[FG.target].name}: CORRECT (${FG.isBuilding?'offensive':'defensive'})`,"gain");
+  } else if(uncertain){
+    G.nations[G.p].intel+=2;
+    result=`<div style="color:var(--warn);text-align:center;margin:12px 0">PRUDENT. Acknowledging uncertainty is rational. The posture was ${FG.isBuilding?'OFFENSIVE':'DEFENSIVE'}. +2 intel for epistemic humility.</div>`;
+    addLog(`Intel assessment on ${N[FG.target].name}: Uncertain (was ${FG.isBuilding?'offensive':'defensive'})`,"");
+  } else {
+    G.nations[G.p].intel-=3;G.rel[G.p][FG.target]-=10;
+    result=`<div style="color:var(--danger);font-weight:700;text-align:center;margin:12px 0">WRONG. You misread the signals. The posture was ${FG.isBuilding?'OFFENSIVE':'DEFENSIVE'}. -3 intel, damaged relations.</div>`;
+    addLog(`Intel assessment on ${N[FG.target].name}: WRONG (was ${FG.isBuilding?'offensive':'defensive'})`,"crisis");
+  }
+  unlock("intentions");
+  // Reveal all cards
+  FG.cards.forEach(c=>c.revealed=true);
+  let h=rFog();
+  h+=result;
+  h+=`<div style="text-align:center;margin-top:12px"><button class="btn p" onclick="closeMG()">Continue</button></div>`;
+  document.getElementById('mgc').innerHTML=h;
+}
+
+// --- NUCLEAR ALERT ---
+let NK={};
+function mgNuke(actor){
+  const source=actor===G.p?Object.keys(G.nations).filter(id=>id!==G.p&&G.nations[id].alive)[0]:actor;
+  // Generate readings - mix of real alarm and false alarm indicators
+  const isFalse=Math.random()<.65; // 65% chance it's false alarm
+  const readings=[];
+  if(isFalse){
+    readings.push({text:"BMEWS detection: Single track, low confidence",cls:"al"});
+    readings.push({text:"DSP satellite: IR bloom detected, sector 7",cls:"al"});
+    readings.push({text:"Second sensor: No corroboration",cls:"cl"});
+    readings.push({text:"Ground radar: Negative contact",cls:"cl"});
+    readings.push({text:"SIGINT: No launch orders intercepted",cls:"cl"});
+    readings.push({text:`${N[source].name} forces: Normal readiness`,cls:"cl"});
+    readings.push({text:"Solar activity: Elevated (potential sensor interference)",cls:"am"});
+    readings.push({text:"Track analysis: Trajectory inconsistent with ICBM",cls:"am"});
+  } else {
+    readings.push({text:"BMEWS detection: Multiple tracks, HIGH confidence",cls:"al"});
+    readings.push({text:"DSP satellite: Multiple IR blooms, sectors 3-7",cls:"al"});
+    readings.push({text:"Second sensor: CORROBORATING detection",cls:"al"});
+    readings.push({text:"SIGINT: Encrypted burst transmissions detected",cls:"al"});
+    readings.push({text:`${N[source].name} forces: Elevated readiness CONFIRMED`,cls:"al"});
+    readings.push({text:"Ground radar: Multiple inbound tracks",cls:"al"});
+    readings.push({text:"Solar activity: Normal",cls:"am"});
+    readings.push({text:"DEFCON shift detected in adversary command",cls:"al"});
+  }
+  NK={source,isFalse,readings,timer:15,done:false,interval:null};
+
+  showMG('\u2622\ufe0f NUCLEAR ALERT',`Possible launch detected from ${N[source].name}. You have 15 seconds.`,rNuke());
+  // Start timer
+  NK.interval=setInterval(()=>{
+    NK.timer--;
+    const tmr=document.getElementById('nktmr');
+    if(tmr)tmr.textContent=NK.timer;
+    if(NK.timer<=0){clearInterval(NK.interval);if(!NK.done)nukeTimeout()}
+  },1000);
+}
+function rNuke(){
+  const s=NK;
+  return `<div class="nukescr">
+    <div style="font-size:.9rem;color:var(--danger);font-weight:700">NUCLEAR ALERT - INCOMING DETECTION</div>
+    <div class="nuketmr" id="nktmr">${s.timer}</div>
+    <div style="font-size:.8rem;color:var(--dim);margin-bottom:8px">SECONDS TO DECISION</div>
+    <div class="nukedata">${s.readings.map(r=>`<div class="rd ${r.cls}">${r.text}</div>`).join('')}</div>
+    ${s.done?`<div style="margin-top:12px"><button class="btn p sm" onclick="closeMG()">Continue</button></div>`:`
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:14px">
+      <button class="btn d" onclick="nukeLaunch()">\u2622\ufe0f LAUNCH RETALIATION</button>
+      <button class="btn" onclick="nukeWait()">\u23f3 RIDE IT OUT</button>
+    </div>`}
+  </div>`;
+}
+function nukeLaunch(){
+  if(NK.done)return;NK.done=true;clearInterval(NK.interval);
+  if(NK.isFalse){
+    // Launched on false alarm -- catastrophe
+    G.nations[G.p].mil-=15;G.nations[NK.source].mil-=15;
+    Object.keys(G.nations).forEach(id=>{G.rel[id][G.p]-=30});
+    addLog(`NUCLEAR CATASTROPHE: Launched on FALSE ALARM against ${N[NK.source].name}. Civilization-ending mistake.`,"crisis");
+    unlock("nuclear_det");unlock("tragedy");
+    document.getElementById('mgc').innerHTML=`<div class="nukescr">
+      <div style="color:var(--danger);font-size:1.2rem;font-weight:700">\ud83d\udca5 YOU LAUNCHED ON A FALSE ALARM</div>
+      <div style="margin:12px 0;color:var(--text)">The detection was a sensor ghost. Your missiles are already in flight. ${N[NK.source].name} launches in response. Hundreds of millions die. This is Stanislav Petrov's nightmare made real.</div>
+      <div style="color:var(--dim);font-style:italic;margin:8px 0">"The whole system is designed to go off. Someone has to be willing to say no."</div>
+      <button class="btn p sm" onclick="closeMG()" style="margin-top:12px">Continue</button></div>`;
+  } else {
+    // Launched on real threat -- mutual destruction but you struck back
+    G.nations[G.p].mil-=12;G.nations[NK.source].mil-=12;G.nations[G.p].nukes-=20;G.nations[NK.source].nukes-=20;
+    addLog(`Nuclear exchange with ${N[NK.source].name}. Both sides devastated.`,"crisis");
+    unlock("nuclear_det");
+    document.getElementById('mgc').innerHTML=`<div class="nukescr">
+      <div style="color:var(--danger);font-size:1.2rem;font-weight:700">\u2622\ufe0f NUCLEAR EXCHANGE</div>
+      <div style="margin:12px 0;color:var(--text)">The threat was real. Your retaliation ensured mutual destruction. MAD held -- but at staggering cost. Both powers are devastated.</div>
+      <button class="btn p sm" onclick="closeMG()" style="margin-top:12px">Continue</button></div>`;
+  }
+}
+function nukeWait(){
+  if(NK.done)return;NK.done=true;clearInterval(NK.interval);
+  if(NK.isFalse){
+    // Waited on false alarm -- the Petrov choice
+    G.nations[G.p].intel+=5;G.score.cs++;
+    addLog(`Nuclear false alarm from ${N[NK.source].name}: Correctly held fire. Petrov would be proud.`,"gain");
+    unlock("nuclear_det");
+    document.getElementById('mgc').innerHTML=`<div class="nukescr" style="border-color:var(--success)">
+      <div style="color:var(--success);font-size:1.2rem;font-weight:700">\u2705 FALSE ALARM - CORRECT HOLD</div>
+      <div style="margin:12px 0;color:var(--text)">You read the signals correctly and held fire. Like Stanislav Petrov in 1983, you chose human judgment over system protocol. The world continues.</div>
+      <div style="color:var(--dim);font-style:italic;margin:8px 0">"I had a funny feeling in my gut." -- Stanislav Petrov</div>
+      <button class="btn p sm" onclick="closeMG()" style="margin-top:12px">Continue</button></div>`;
+  } else {
+    // Waited on real attack -- absorbed first strike
+    G.nations[G.p].mil-=18;G.nations[G.p].nukes-=10;G.nations[G.p].econ-=15;
+    addLog(`${N[NK.source].name} first strike absorbed! Catastrophic damage. Hesitation was fatal.`,"crisis");
+    unlock("nuclear_det");unlock("tragedy");
+    document.getElementById('mgc').innerHTML=`<div class="nukescr">
+      <div style="color:var(--danger);font-size:1.2rem;font-weight:700">\ud83d\udca5 FIRST STRIKE ABSORBED</div>
+      <div style="margin:12px 0;color:var(--text)">The attack was real. By waiting, you absorbed a devastating first strike. Your retaliatory capability is crippled. Deterrence failed because you flinched.</div>
+      <button class="btn p sm" onclick="closeMG()" style="margin-top:12px">Continue</button></div>`;
+  }
+}
+function nukeTimeout(){
+  // Same as wait
+  nukeWait();
+}
+
+// --- PROXY WAR ---
+let PX={};
+function mgProxy(actor){
+  const regions=Object.keys(R).filter(r=>!R[r].owner);
+  const zone=regions[~~(Math.random()*regions.length)];
+  const opp=actor===G.p?Object.keys(G.nations).filter(id=>id!==G.p&&G.nations[id].alive)[0]:actor;
+  PX={zone,opp,yourF:10,theirF:10,esc:0,round:1,maxRound:5,res:{arms:3,money:3,advisors:2},done:false};
+  showMG('\ud83c\udf0d PROXY WAR',`Contested zone: ${R[zone].name}. Compete for influence without triggering direct confrontation.`,rProxy());
+}
+function rProxy(){
+  const s=PX;const total=s.yourF+s.theirF;
+  return `<div style="text-align:center;margin-bottom:8px" class="mono">Round ${s.round}/${s.maxRound} | Escalation: ${s.esc}/100</div>
+  <div class="pxzone">
+    <div class="pxside"><h4 class="cinzel">${N[G.p].flag} You</h4><div class="mono" style="font-size:1.3rem;color:var(--accent)">${s.yourF}</div></div>
+    <div style="text-align:center;color:var(--dim);font-size:.8rem">${R[s.zone].name}<br>VS</div>
+    <div class="pxside"><h4 class="cinzel">${N[s.opp].flag} ${N[s.opp].name}</h4><div class="mono" style="font-size:1.3rem;color:var(--danger)">${s.theirF}</div></div>
+  </div>
+  <div class="pxbar"><div class="pxbf y" style="width:${s.yourF/total*100}%"></div><div class="pxbf t" style="width:${s.theirF/total*100}%"></div></div>
+  <div style="font-size:.78rem;color:var(--dim);margin-bottom:4px">Escalation Risk:</div>
+  <div class="pxesc"><div class="pxescf" style="width:${s.esc}%"></div></div>
+  <div style="display:flex;gap:8px;justify-content:center;margin:10px 0;font-size:.78rem">
+    <div style="background:var(--bg3);padding:4px 10px;border-radius:4px">Arms: ${s.res.arms}</div>
+    <div style="background:var(--bg3);padding:4px 10px;border-radius:4px">Money: ${s.res.money}</div>
+    <div style="background:var(--bg3);padding:4px 10px;border-radius:4px">Advisors: ${s.res.advisors}</div>
+  </div>
+  ${s.done?`<div style="text-align:center;margin:12px 0" id="pxst"></div><button class="btn p" onclick="closeMG()" style="display:block;margin:auto">Continue</button>`:`
+  <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+    <button class="btn sm" onclick="pxAct('arms')" ${s.res.arms<=0?'disabled':''}>Send Arms (+3F, +15esc)</button>
+    <button class="btn sm" onclick="pxAct('money')" ${s.res.money<=0?'disabled':''}>Fund Proxy (+2F, +8esc)</button>
+    <button class="btn sm" onclick="pxAct('adv')" ${s.res.advisors<=0?'disabled':''}>Deploy Advisors (+4F, +20esc)</button>
+    <button class="btn sm w" onclick="pxAct('diplo')">Diplomatic Cover (-10esc)</button>
+    <button class="btn sm" onclick="pxAct('hold')">Hold Position</button>
+  </div>`}`;
+}
+function pxOpp(){
+  const s=PX;const agg=.4+G.dm*.1;
+  if(Math.random()<agg)s.theirF+=3+~~(Math.random()*3);else s.theirF+=1+~~(Math.random()*2);
+  s.esc+=~~(Math.random()*10);
+}
+function pxAct(a){
+  const s=PX;
+  switch(a){
+    case'arms':if(s.res.arms<=0)return;s.res.arms--;s.yourF+=3;s.esc+=15;break;
+    case'money':if(s.res.money<=0)return;s.res.money--;s.yourF+=2;s.esc+=8;break;
+    case'adv':if(s.res.advisors<=0)return;s.res.advisors--;s.yourF+=4;s.esc+=20;break;
+    case'diplo':s.esc=Math.max(0,s.esc-10);break;
+    case'hold':s.yourF+=1;s.esc+=3;break;
+  }
+  pxOpp();s.round++;
+  // Check escalation
+  if(s.esc>=100){pxEscalate();return}
+  if(s.round>s.maxRound){pxResolve();return}
+  document.getElementById('mgc').innerHTML=rProxy();
+}
+function pxEscalate(){
+  PX.done=true;G.nations[G.p].mil-=8;G.nations[PX.opp].mil-=8;G.rel[G.p][PX.opp]-=20;
+  addLog(`Proxy war in ${R[PX.zone].name} escalated to direct confrontation with ${N[PX.opp].name}!`,"crisis");
+  unlock("tragedy");
+  document.getElementById('mgc').innerHTML=rProxy();
+  document.getElementById('pxst').innerHTML=`<span style="color:var(--danger);font-weight:700">\ud83d\udca5 ESCALATION! The proxy war became a real war. Both powers suffer.</span>`;
+}
+function pxResolve(){
+  PX.done=true;
+  if(PX.yourF>PX.theirF){
+    G.regions[PX.zone].controller=G.p;G.nations[G.p].inf+=4;G.score.cs++;
+    addLog(`Proxy war won in ${R[PX.zone].name}. Gained influence.`,"gain");
+    document.getElementById('mgc').innerHTML=rProxy();
+    document.getElementById('pxst').innerHTML=`<span style="color:var(--success)">Victory! You control ${R[PX.zone].name} through your proxy.</span>`;
+  } else if(PX.theirF>PX.yourF){
+    G.regions[PX.zone].controller=PX.opp;G.nations[G.p].inf-=3;
+    addLog(`Proxy war lost in ${R[PX.zone].name}. ${N[PX.opp].name} gains control.`,"crisis");
+    document.getElementById('mgc').innerHTML=rProxy();
+    document.getElementById('pxst').innerHTML=`<span style="color:var(--danger)">${N[PX.opp].name} wins. They control ${R[PX.zone].name}.</span>`;
+  } else {
+    addLog(`Proxy war in ${R[PX.zone].name}: stalemate.`,"");
+    document.getElementById('mgc').innerHTML=rProxy();
+    document.getElementById('pxst').innerHTML=`<span style="color:var(--warn)">Stalemate. Neither side prevails. The zone remains contested.</span>`;
+  }
+}
+
+// === VICTORY / END ===
+function checkWin(){
+  const pc=Object.values(G.regions).filter(r=>r.controller===G.p).length;
+  G.score.rc=pc;
+  // Hegemony check
+  if(pc>=9){endGame('hegemony');return}
+  // Elimination check
+  const alive=Object.entries(G.nations).filter(([id,n])=>id!==G.p&&n.alive&&(n.mil+n.econ)>10);
+  if(alive.length===0){endGame('domination')}
+}
+
+function endGame(type){
+  const scr=document.getElementById('endscr');
+  const n=G.nations[G.p];
+  const pc=Object.values(G.regions).filter(r=>r.controller===G.p).length;
+  const totalPow=n.mil+n.econ;
+  const maxAI=Math.max(0,...Object.entries(G.nations).filter(([id])=>id!==G.p).map(([,n])=>n.mil+n.econ));
+
+  let title,narrative;
+  if(type==='hegemony'){
+    title='REGIONAL HEGEMONY ACHIEVED';
+    narrative=`You have achieved what Mearsheimer says every great power strives for: regional hegemony. ${N[G.p].name} dominates its sphere. But the tragedy persists -- other powers will never stop trying to pull you down. Hegemony is a position, not a destination.`;
+  } else if(type==='domination'){
+    title='TOTAL DOMINATION';
+    narrative=`Every rival crushed. But Mearsheimer would remind you: this is temporary. New powers will rise from the ashes. The structure of anarchy guarantees it. You've won the game, but the tragedy has no end.`;
+  } else if(totalPow>maxAI*1.2){
+    title='PREEMINENT POWER';
+    narrative=`${N[G.p].name} ends the era as the world's preeminent power. But preeminence is not hegemony, and the security dilemma ensures your rivals are already planning their challenge. The iron cage holds.`;
+  } else if(totalPow>maxAI*.8){
+    title='GREAT POWER SURVIVAL';
+    narrative=`You survived. In the world Mearsheimer describes, that's no small achievement. You remain a great power in a multipolar world -- which means the competition continues indefinitely. The tragedy is that there is no escape.`;
+  } else {
+    title='DECLINE';
+    narrative=`${N[G.p].name} has declined relative to its rivals. The structure punishes weakness. Other great powers will exploit your vulnerability. In offensive realism, there are no participation trophies -- only power and the lack of it.`;
+  }
+
+  document.getElementById('endt').textContent=title;
+  document.getElementById('endn').textContent=narrative;
+
+  let stats='';
+  stats+=`<div class="erow"><span>Final Year</span><span class="mono">${G.year}</span></div>`;
+  stats+=`<div class="erow"><span>Military Power</span><span class="mono" style="color:var(--danger)">${n.mil}</span></div>`;
+  stats+=`<div class="erow"><span>Economic Power</span><span class="mono" style="color:var(--success)">${n.econ}</span></div>`;
+  stats+=`<div class="erow"><span>Total Power</span><span class="mono">${totalPow}</span></div>`;
+  stats+=`<div class="erow"><span>Regions Controlled</span><span class="mono">${pc}/12</span></div>`;
+  stats+=`<div class="erow"><span>Wars Won</span><span class="mono">${G.score.ww}</span></div>`;
+  stats+=`<div class="erow"><span>Wars Lost</span><span class="mono">${G.score.wl}</span></div>`;
+  stats+=`<div class="erow"><span>Crises Survived</span><span class="mono">${G.score.cs}</span></div>`;
+  stats+=`<div class="erow"><span>Nuclear Warheads</span><span class="mono">${n.nukes}</span></div>`;
+  stats+=`<div class="erow"><span>Concepts Unlocked</span><span class="mono" style="color:var(--purple)">${G.unlocked.size}/${CONCEPTS.length}</span></div>`;
+
+  // Grade
+  const grade=G.unlocked.size>=16?'A+':G.unlocked.size>=12?'A':G.unlocked.size>=8?'B':G.unlocked.size>=5?'C':'D';
+  stats+=`<div class="erow" style="margin-top:8px;border-top:2px solid var(--purple)"><span style="color:var(--purple)">Theory Mastery Grade</span><span class="mono" style="color:var(--purple);font-size:1.2rem">${grade}</span></div>`;
+
+  document.getElementById('endst').innerHTML=stats;
+  scr.classList.add('active');
+}
+
+</script>
+</body>
+</html>
